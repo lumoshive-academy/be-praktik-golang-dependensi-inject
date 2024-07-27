@@ -1,2 +1,2 @@
-# be-praktik-golang-google-wire
+# be-praktik-golang-dependensi-inject
 repository for implementation google wire (DI)
