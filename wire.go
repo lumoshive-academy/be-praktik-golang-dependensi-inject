@@ -10,12 +10,12 @@ import (
 	"github.com/google/wire"
 )
 
-var SuperSet = wire.NewSet(
-	greeter.NewGreeter,
-	service.NewService,
-)
-
-func InitializMyService() (*service.Service, error) {
-	wire.Build(SuperSet)
+func InitializMyService(name string) (*service.Service, error) {
+	wire.Build(greeter.NewGreeter, service.NewService)
 	return nil, nil
 }
+
+// var SuperSet = wire.NewSet(
+// 	greeter.NewGreeter,
+// 	service.NewService,
+// )

@@ -7,19 +7,17 @@
 package main
 
 import (
-	"github.com/google/wire"
 	"golang-dependensi-inject/greeter"
 	"golang-dependensi-inject/service"
 )
 
 // Injectors from wire.go:
 
-func InitializMyService() (*service.Service, error) {
-	greeterGreeter := greeter.NewGreeter()
-	serviceService := service.NewService(greeterGreeter)
+func InitializMyService(name string) (*service.Service, error) {
+	greeterGreeter := greeter.NewGreeter(name)
+	serviceService, err := service.NewService(greeterGreeter)
+	if err != nil {
+		return nil, err
+	}
 	return serviceService, nil
 }
-
-// wire.go:
-
-var SuperSet = wire.NewSet(greeter.NewGreeter, service.NewService)

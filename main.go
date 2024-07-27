@@ -3,7 +3,7 @@ package main
 import "fmt"
 
 func main() {
-	service, err := InitializMyService()
+	service, err := InitializMyService("Lumoshive")
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
