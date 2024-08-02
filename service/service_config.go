@@ -3,9 +3,10 @@ package service
 import "golang-dependensi-inject/config"
 
 type ServiceConfig struct {
-	Config *config.Config
+	ConfigA *config.ConfigA
+	ConfigB *config.ConfigB
 }
 
-func NewServiceConfig(cfg *config.Config) *ServiceConfig {
-	return &ServiceConfig{Config: cfg}
+func NewServiceConfig(cfga *config.ConfigA, cfgb *config.ConfigB) *ServiceConfig {
+	return &ServiceConfig{ConfigA: cfga, ConfigB: cfgb}
 }

@@ -7,8 +7,11 @@
 package main
 
 import (
+	"github.com/google/wire"
+	"golang-dependensi-inject/config"
 	"golang-dependensi-inject/greeter"
 	"golang-dependensi-inject/service"
+	"golang-dependensi-inject/storage"
 )
 
 // Injectors from wire.go:
@@ -21,3 +24,34 @@ func InitializMyService(name string) (*service.Service, error) {
 	}
 	return serviceService, nil
 }
+
+func InitializeServiceConfig() *service.ServiceConfig {
+	configA := config.NewConfig()
+	configB := config.NewConfigAlternative()
+	serviceServiceConfig := service.NewServiceConfig(configA, configB)
+	return serviceServiceConfig
+}
+
+// InitializeInMemoryStorage menginisialisasi storage menggunakan InMemoryStorageSet
+func InitializeCachingData() (storage.Storage, error) {
+	cachingData := service.NewCachingData()
+	return cachingData, nil
+}
+
+// InitializeDatabaseStorage menginisialisasi storage menggunakan DatabaseStorageSet
+func InitializeDatabaseStorage() (storage.Storage, error) {
+	databaseStorage := service.NewDatabaseStorage()
+	return databaseStorage, nil
+}
+
+// wire.go:
+
+var myservice = wire.NewSet(greeter.NewGreeter, service.NewService)
+
+var serviceConfig = wire.NewSet(config.NewConfig, config.NewConfigAlternative, service.NewServiceConfig)
+
+// InMemoryStorageSet menghubungkan Storage dengan InMemoryStorage
+var cachingDataSet = wire.NewSet(service.NewCachingData, wire.Bind(new(storage.Storage), new(*storage.CachingData)))
+
+// DatabaseStorageSet menghubungkan Storage dengan DatabaseStorage
+var databaseStorageSet = wire.NewSet(service.NewDatabaseStorage, wire.Bind(new(storage.Storage), new(*storage.DatabaseStorage)))
