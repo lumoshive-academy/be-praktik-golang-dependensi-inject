@@ -10,6 +10,7 @@ import (
 	"github.com/google/wire"
 	"golang-dependensi-inject/config"
 	"golang-dependensi-inject/greeter"
+	"golang-dependensi-inject/notification"
 	"golang-dependensi-inject/service"
 	"golang-dependensi-inject/storage"
 )
@@ -32,7 +33,7 @@ func InitializeServiceConfig() *service.ServiceConfig {
 	return serviceServiceConfig
 }
 
-// InitializeInMemoryStorage menginisialisasi storage menggunakan InMemoryStorageSet
+// InitializeCachingData menginisialisasi storage menggunakan InMemoryStorageSet
 func InitializeCachingData() (storage.Storage, error) {
 	cachingData := service.NewCachingData()
 	return cachingData, nil
@@ -44,14 +45,29 @@ func InitializeDatabaseStorage() (storage.Storage, error) {
 	return databaseStorage, nil
 }
 
+// InitializeNotifier menginisialisasi Notifier dengan ketergantungan yang diperlukan
+func InitializeNotifier() (*service.Notifier, error) {
+	emailService := notification.NewEmailService()
+	smsService := notification.NewSMSService()
+	notifConfig := config.NewNotifConfig()
+	notifier := &service.Notifier{
+		EmailService: emailService,
+		SMSService:   smsService,
+		NotifConfig:  notifConfig,
+	}
+	return notifier, nil
+}
+
 // wire.go:
 
 var myservice = wire.NewSet(greeter.NewGreeter, service.NewService)
 
 var serviceConfig = wire.NewSet(config.NewConfig, config.NewConfigAlternative, service.NewServiceConfig)
 
-// InMemoryStorageSet menghubungkan Storage dengan InMemoryStorage
+// cachingDataSet menghubungkan Storage dengan InMemoryStorage
 var cachingDataSet = wire.NewSet(service.NewCachingData, wire.Bind(new(storage.Storage), new(*storage.CachingData)))
 
 // DatabaseStorageSet menghubungkan Storage dengan DatabaseStorage
 var databaseStorageSet = wire.NewSet(service.NewDatabaseStorage, wire.Bind(new(storage.Storage), new(*storage.DatabaseStorage)))
+
+var notifierSet = wire.NewSet(notification.NewEmailService, notification.NewSMSService, config.NewNotifConfig)

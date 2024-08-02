@@ -33,4 +33,11 @@ func main() {
 	databaseStorage.Save("Hello, Database!")
 	data, _ = databaseStorage.Load()
 	fmt.Println(data) // Output: "Hello, Database!"
+
+	notifier, err := InitializeNotifier()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	notifier.SendNotification("Hello, this is a notification!")
 }
