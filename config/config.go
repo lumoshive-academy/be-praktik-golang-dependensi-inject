@@ -27,6 +27,8 @@ func NewConfigAlternative() *ConfigB {
 // AppConfig adalah struct yang menyimpan konfigurasi aplikasi
 type AppConfig struct {
 	AppName string
+	Port    int
+	DBName  string
 	Version int
 }
 

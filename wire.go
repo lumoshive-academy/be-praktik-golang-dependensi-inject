@@ -75,11 +75,6 @@ func InitializeNotifier() (*service.Notifier, error) {
 	return nil, nil
 }
 
-func injectReader() io.Reader {
-	wire.Build(wire.InterfaceValue(new(io.Reader), os.Stdin))
-	return nil
-}
-
 // InitializeAppConfig menginisialisasi AppConfig dengan nilai konstan
 func InitializeAppConfig() (*config.AppConfig, error) {
 	wire.Build(
@@ -88,4 +83,40 @@ func InitializeAppConfig() (*config.AppConfig, error) {
 		wire.Struct(new(config.AppConfig), "AppName", "Version"),
 	)
 	return nil, nil
+}
+
+func injectReader() io.Reader {
+	wire.Build(wire.InterfaceValue(new(io.Reader), os.Stdin))
+	return nil
+}
+
+var AppConfig = config.AppConfig{
+	AppName: "MyApp",
+	Port:    8080,
+	DBName:  "mydatabase",
+}
+
+var ConfigSet = wire.NewSet(
+	wire.Value(AppConfig),
+	wire.FieldsOf(new(config.AppConfig), "DBName"),
+)
+
+var DatabaseSet = wire.NewSet(
+	ConfigSet,
+	storage.NewDatabase,
+)
+
+func InitializeDatabase() *storage.Database {
+	wire.Build(DatabaseSet)
+	return nil
+}
+
+var DatabaseSetWithCleanUp = wire.NewSet(
+	ConfigSet,
+	storage.NewDatabaseWithCleanUp,
+)
+
+func InitializeDatabaseWithCleanUp() (*storage.Database, func(), error) {
+	wire.Build(DatabaseSetWithCleanUp)
+	return nil, nil, nil
 }

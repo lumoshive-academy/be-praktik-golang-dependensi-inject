@@ -60,15 +60,6 @@ func InitializeNotifier() (*service.Notifier, error) {
 	return notifier, nil
 }
 
-func injectReader() io.Reader {
-	reader := _wireFileValue
-	return reader
-}
-
-var (
-	_wireFileValue = os.Stdin
-)
-
 // InitializeAppConfig menginisialisasi AppConfig dengan nilai konstan
 func InitializeAppConfig() (*config.AppConfig, error) {
 	string2 := _wireStringValue
@@ -85,6 +76,38 @@ var (
 	_wireIntValue    = 1
 )
 
+func injectReader() io.Reader {
+	reader := _wireFileValue
+	return reader
+}
+
+var (
+	_wireFileValue = os.Stdin
+)
+
+func InitializeDatabase() *storage.Database {
+	appConfig := _wireAppConfigValue
+	string2 := appConfig.DBName
+	database := storage.NewDatabase(string2)
+	return database
+}
+
+var (
+	_wireAppConfigValue = AppConfig
+)
+
+func InitializeDatabaseWithCleanUp() (*storage.Database, func(), error) {
+	appConfig := _wireAppConfigValue
+	string2 := appConfig.DBName
+	database, cleanup, err := storage.NewDatabaseWithCleanUp(string2)
+	if err != nil {
+		return nil, nil, err
+	}
+	return database, func() {
+		cleanup()
+	}, nil
+}
+
 // wire.go:
 
 var myservice = wire.NewSet(greeter.NewGreeter, service.NewService)
@@ -98,3 +121,19 @@ var cachingDataSet = wire.NewSet(service.NewCachingData, wire.Bind(new(storage.S
 var databaseStorageSet = wire.NewSet(service.NewDatabaseStorage, wire.Bind(new(storage.Storage), new(*storage.DatabaseStorage)))
 
 var notifierSet = wire.NewSet(notification.NewEmailService, notification.NewSMSService, config.NewNotifConfig)
+
+var AppConfig = config.AppConfig{
+	AppName: "MyApp",
+	Port:    8080,
+	DBName:  "mydatabase",
+}
+
+var ConfigSet = wire.NewSet(wire.Value(AppConfig), wire.FieldsOf(new(config.AppConfig), "DBName"))
+
+var DatabaseSet = wire.NewSet(
+	ConfigSet, storage.NewDatabase,
+)
+
+var DatabaseSetWithCleanUp = wire.NewSet(
+	ConfigSet, storage.NewDatabaseWithCleanUp,
+)
