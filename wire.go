@@ -9,6 +9,8 @@ import (
 	"golang-dependensi-inject/notification"
 	"golang-dependensi-inject/service"
 	"golang-dependensi-inject/storage"
+	"io"
+	"os"
 
 	"github.com/google/wire"
 )
@@ -69,6 +71,21 @@ func InitializeNotifier() (*service.Notifier, error) {
 	wire.Build(
 		notifierSet,
 		wire.Struct(new(service.Notifier), "*"),
+	)
+	return nil, nil
+}
+
+func injectReader() io.Reader {
+	wire.Build(wire.InterfaceValue(new(io.Reader), os.Stdin))
+	return nil
+}
+
+// InitializeAppConfig menginisialisasi AppConfig dengan nilai konstan
+func InitializeAppConfig() (*config.AppConfig, error) {
+	wire.Build(
+		wire.Value("MyApp"),
+		wire.Value(1),
+		wire.Struct(new(config.AppConfig), "AppName", "Version"),
 	)
 	return nil, nil
 }

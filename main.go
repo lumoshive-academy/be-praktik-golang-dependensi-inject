@@ -30,10 +30,12 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	databaseStorage.Save("Hello, Database!")
 	data, _ = databaseStorage.Load()
 	fmt.Println(data) // Output: "Hello, Database!"
 
+	// InitializeApp dengan Notifier
 	notifier, err := InitializeNotifier()
 	if err != nil {
 		log.Fatal(err)

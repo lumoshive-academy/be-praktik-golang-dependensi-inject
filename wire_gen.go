@@ -13,6 +13,8 @@ import (
 	"golang-dependensi-inject/notification"
 	"golang-dependensi-inject/service"
 	"golang-dependensi-inject/storage"
+	"io"
+	"os"
 )
 
 // Injectors from wire.go:
@@ -57,6 +59,31 @@ func InitializeNotifier() (*service.Notifier, error) {
 	}
 	return notifier, nil
 }
+
+func injectReader() io.Reader {
+	reader := _wireFileValue
+	return reader
+}
+
+var (
+	_wireFileValue = os.Stdin
+)
+
+// InitializeAppConfig menginisialisasi AppConfig dengan nilai konstan
+func InitializeAppConfig() (*config.AppConfig, error) {
+	string2 := _wireStringValue
+	int2 := _wireIntValue
+	appConfig := &config.AppConfig{
+		AppName: string2,
+		Version: int2,
+	}
+	return appConfig, nil
+}
+
+var (
+	_wireStringValue = "MyApp"
+	_wireIntValue    = 1
+)
 
 // wire.go:
 
